@@ -1,0 +1,4 @@
+rootProject.name = 'rekorder'
+
+include 'library'
+include 'application'
