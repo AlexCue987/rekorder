@@ -1,5 +1,7 @@
 package org.kollektions.proksy
 
+import io.mockk.every
+import io.mockk.mockk
 import org.kollektions.proksy.CallRecorder.Companion.getProxy
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -32,11 +34,26 @@ class CallRecorderTest {
 
     @Test
     fun `record and rethrow exception`() {
-        val reason = "Just because I said so"
-        val exception = assertFailsWith<Exception> { proxy.validateReason(reason) }
+        val reason = "Because I said so"
+        val exception = assertFailsWith<TestException> { proxy.validateReason(reason) }
         val results = sut.getCalls()
-        val expected = FunctionCall("validateReason", listOf(reason), ExceptionResult(Exception("Bad reason: \"Just because I said so\"")))
+        val expected = FunctionCall("validateReason", listOf(reason), ExceptionResult(TestException("Bad reason: \"Because I said so\"")))
         assertEquals(listOf(expected), results)
+    }
+
+    @Test
+    fun myTest() {
+        println("--------- MyTest -------------")
+        val rover = mockk<Rover>()
+        every { rover.explore(1) } returns 1 andThenThrows TestException("Oops") andThen 3
+        (1..4).asSequence().forEach {
+            println("--------- $it -------------")
+            try {
+                println("Ran ${rover.explore(1)}")
+            } catch (ex: Exception) {
+                println("Caught: $ex")
+            }
+        }
     }
 
 }
@@ -64,7 +81,9 @@ class Rover() : IRover {
 
     override fun doSomething(times: Int, what: Something) = what
 
-    override fun validateReason(reason: String): String = if(reason == "Because") "Correct" else throw Exception("Bad reason: \"$reason\"")
+    override fun validateReason(reason: String): String = if(reason == "Because") "Correct" else throw TestException("Bad reason: \"$reason\"")
 }
+
+class TestException(message: String): RuntimeException(message)
 
 data class Something(val name: String, val color: String, val weight: BigDecimal, val tags: List<String>)

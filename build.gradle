@@ -44,7 +44,7 @@ dependencies {
 
 sourceSets {
     test {
-        kotlin.srcDirs = ['src/test/kotlin/unit', 'src/test/java/unit']
+        kotlin.srcDirs = ['src/test/kotlin/unit']
     }
 }
 

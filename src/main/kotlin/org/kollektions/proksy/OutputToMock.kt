@@ -6,8 +6,12 @@ import java.lang.reflect.Proxy
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.*
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.memberProperties
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
 
 class CallRecorder {
     private val functionCalls = mutableListOf<FunctionCall>()
@@ -30,8 +34,7 @@ class CallRecorder {
                 } catch (ex: InvocationTargetException) {
                     val targetException = ex.targetException
                     val cause = targetException.cause
-                    val wrappedException = ExceptionResult(targetException!!)
-                    callRecorder.save(FunctionCall(method.name, args.toList(), wrappedException))
+                    callRecorder.save(FunctionCall(method.name, args.toList(), ExceptionResult(targetException!!)))
                     throw targetException
                 }
             } as T
@@ -100,7 +103,7 @@ class OutputToMock(val instanceName: String, val className: String) {
     }
 
     fun argsAsCsv(args: List<*>): String {
-        val argsList = args.joinToString(", ") { output(it) }
+        val argsList = args.joinToString(",\n") { output(it) }
         return argsList
     }
 
@@ -108,7 +111,7 @@ class OutputToMock(val instanceName: String, val className: String) {
         val argsList = args.entries.map {
             val value = "${output(it.key)} to ${output(it.value)}"
             value
-        } .joinToString(", \n")
+        } .joinToString(",\n")
         return argsList
     }
 
@@ -126,11 +129,13 @@ class OutputToMock(val instanceName: String, val className: String) {
             arg is Long -> "${arg}L"
             arg is String -> "\"$arg\""
             arg is LocalDate -> "LocalDate.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth})"
+            arg is LocalTime -> "LocalTime.of(${arg.hour}, ${arg.minute}, ${arg.second})"
             arg is LocalDateTime -> "LocalDateTime.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth}, ${arg.hour}, ${arg.minute}, ${arg.second})"
             arg is BigDecimal -> "BigDecimal(\"${arg.toPlainString()}\")"
-            arg is List<*> -> "listOf(${argsAsCsv(arg)})"
-            arg is Set<*> -> "setOf(${argsAsCsv(arg.toList())})"
-            arg is Map<*, *> -> "mapOf(${argsAsMap(arg)})"
+            arg is List<*> -> "listOf(\n${argsAsCsv(arg)}\n)"
+            arg is Set<*> -> "setOf(\n${argsAsCsv(arg.toList())}\n)"
+            arg is Map<*, *> -> "mapOf(\n${argsAsMap(arg)}\n)"
+//            arg::class.isData -> throw NotImplementedError("")
             else -> outputInstance(arg)
         }
     }
@@ -138,16 +143,26 @@ class OutputToMock(val instanceName: String, val className: String) {
     fun outputInstance(arg: Any): String {
         val className = arg.javaClass.simpleName
         val ignoredFields = if(className in ignoredFieldsMap) ignoredFieldsMap[className] else listOf()
-        val fields = arg::class.memberProperties
-        val declaredFields = arg.javaClass.declaredFields
+        val fields = getFields(arg)
         val fieldValues = fields
             .filter { it.name !in ignoredFields!! }
             .map {
-                print("Accessing $className.${it.name}\n")
+                it.getter.isAccessible = true
                 val value = it.getter.call(arg)
                 "${it.name} = ${output(value)}"
             }
-        return "$className(${fieldValues.joinToString( ", \n")})"
+        return "$className(${fieldValues.joinToString( ",\n")})"
+    }
+
+    fun getFields(arg: Any): Collection<KProperty1<out Any, *>> {
+        val fields = arg::class.memberProperties
+        if(arg::class.isData) {
+            val klass = arg.javaClass.kotlin
+            val primaryConstructor = klass.primaryConstructor
+            val params = primaryConstructor!!.parameters
+            return params.map { param -> fields.first { field -> field.name == param.name} }
+        }
+        return fields
     }
 
 }
@@ -166,5 +181,4 @@ data class ExceptionResult(val exception: Throwable): IResult  {
 
 data class ObjectResult(val result: Any): IResult
 
-data class FunctionCall(val functionName: String, val arguments: List<Any>, val result: IResult) {
-}
+data class FunctionCall(val functionName: String, val arguments: List<Any>, val result: IResult)
