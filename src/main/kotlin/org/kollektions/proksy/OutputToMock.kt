@@ -1,5 +1,6 @@
 package org.kollektions.proksy
 
+import java.lang.Exception
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
@@ -135,23 +136,24 @@ class OutputToMock(val instanceName: String, val className: String) {
             arg is List<*> -> "listOf(\n${argsAsCsv(arg)}\n)"
             arg is Set<*> -> "setOf(\n${argsAsCsv(arg.toList())}\n)"
             arg is Map<*, *> -> "mapOf(\n${argsAsMap(arg)}\n)"
-//            arg::class.isData -> throw NotImplementedError("")
             else -> outputInstance(arg)
         }
     }
 
     fun outputInstance(arg: Any): String {
         val className = arg.javaClass.simpleName
-        val ignoredFields = if(className in ignoredFieldsMap) ignoredFieldsMap[className] else listOf()
         val fields = getFields(arg)
-        val fieldValues = fields
-            .filter { it.name !in ignoredFields!! }
-            .map {
-                it.getter.isAccessible = true
-                val value = it.getter.call(arg)
-                "${it.name} = ${output(value)}"
-            }
-        return "$className(${fieldValues.joinToString( ",\n")})"
+        val nameValuePairs = fieldsWithValues(arg, fields)
+        return if(arg::class.isData) {
+            val namedParams = nameValuePairs.map { "${it.first} = ${output(it.second)}" }
+            "$className(${namedParams.joinToString(",")})"
+        }
+        else {
+            val variableDefinitions = nameValuePairs.map { "val ${it.first} = ${output(it.second)}" }
+            val variableNames = nameValuePairs.map { it.first }
+            "$className({{${variableDefinitions.joinToString("\n")}\n" +
+                "$className(${variableNames.joinToString(",")})}}())"
+        }
     }
 
     fun getFields(arg: Any): Collection<KProperty1<out Any, *>> {
@@ -165,20 +167,100 @@ class OutputToMock(val instanceName: String, val className: String) {
         return fields
     }
 
+    fun fieldsWithValues(intstance: Any, fields: Collection<KProperty1<out Any, *>>): List<Pair<String, Any?>> {
+        return fields.asSequence()
+            .map {
+                it.getter.isAccessible = true
+                val value = it.getter.call(intstance)
+                Pair(it.name, value)
+            }
+            .toList()
+    }
 }
-
-interface IResult{}
-
-class UnitResult: IResult {
-    override fun equals(other: Any?) = other is UnitResult
-}
-
-data class ExceptionResult(val exception: Throwable): IResult  {
-    override fun equals(other: Any?) = other is ExceptionResult
-        && exception.javaClass.name == other.exception.javaClass.name
-        && exception.message == other.exception.message
-}
-
-data class ObjectResult(val result: Any): IResult
 
 data class FunctionCall(val functionName: String, val arguments: List<Any>, val result: IResult)
+
+data class FunctionCallsSummary(val functionName: String,
+                                val arguments: List<Any>,
+                                val results: MutableList<IResult>) {
+    constructor(functionCall: FunctionCall): this(functionCall.functionName,
+        functionCall.arguments, mutableListOf(functionCall.result))
+
+    init {
+        require(results.isNotEmpty()) { "Results cannot be empty" }
+    }
+
+    fun addResult(result: IResult) {
+        results.add(result)
+    }
+}
+
+class CallsOrganizer{
+    fun organize(functionCalls: List<FunctionCall>): List<FunctionCallsSummary>{
+        val savedCalls = mutableListOf<FunctionCallsSummary>()
+        for(functionCall in functionCalls) {
+            addCall(savedCalls, functionCall)
+        }
+        return savedCalls
+    }
+
+    private fun addCall(savedCalls: MutableList<FunctionCallsSummary>, functionCall: FunctionCall) {
+        for (savedCall in savedCalls) {
+            if (savedCall.functionName == functionCall.functionName
+                        && savedCall.arguments == functionCall.arguments) {
+                savedCall.addResult(functionCall.result)
+                return
+            }
+        }
+        savedCalls.add(FunctionCallsSummary(functionCall))
+    }
+}
+
+class MocksGenerator(val outputToMock: OutputToMock) {
+    fun generateCallsOfEvery(mockName: String, calls: List<FunctionCallsSummary>): String {
+        throw Exception("")
+    }
+
+    fun resultsForOneListOfArguments(mockName: String, call: FunctionCallsSummary): String {
+        val stub = oneResultStr(mockName, call)
+        if (call.results.distinct().size == 1) {
+            return stub
+        }
+        var ret = stub
+        (1 until call.results.size).asSequence().forEach {
+            val result = call.results[it]
+            ret += nextResultStr(result)
+        }
+        return ret
+    }
+
+    fun oneResultStr(mockName: String, call: FunctionCallsSummary): String {
+        val stub = stubStr(mockName, call)
+        val firstResult = call.results.first()
+        return stub + firstResultStr(firstResult)
+    }
+
+    fun stubStr(mockName: String, call: FunctionCallsSummary): String {
+        val args = call.arguments.asSequence()
+            .map { outputToMock.output(it) }
+            .joinToString(",\n")
+        val stub = "every({ $mockName.${call.functionName}($args) }).\n"
+        return stub
+    }
+
+    fun firstResultStr(firstResult: IResult): String {
+        return when (firstResult) {
+            is ObjectResult -> "returns(${outputToMock.output(firstResult.result)})"
+            is UnitResult -> "just(Runs)"
+            is ExceptionResult -> "throws(${outputToMock.output(firstResult.exception)})"
+        }
+    }
+
+    fun nextResultStr(result: IResult): String {
+        return when (result) {
+            is ObjectResult -> "\n.andThen(${outputToMock.output(result.result)})"
+            is ExceptionResult -> "\n.andThenThrows(${outputToMock.output(result.exception)})"
+            is UnitResult -> "\n.andThen(Unit)"
+        }
+    }
+}
