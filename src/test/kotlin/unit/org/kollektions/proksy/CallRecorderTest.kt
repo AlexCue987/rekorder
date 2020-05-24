@@ -2,18 +2,27 @@ package org.kollektions.proksy
 
 import io.mockk.every
 import io.mockk.mockk
+import org.junit.AfterClass
+import org.junit.Before
+import org.junit.BeforeClass
 import org.kollektions.proksy.CallRecorder.Companion.getProxy
 import java.math.BigDecimal
-import java.time.LocalDate
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class CallRecorderTest {
     val sut = CallRecorder()
     val instanceToMock = Rover()
     val proxy = getProxy<IRover>(instanceToMock, sut)
+
+    @Before
+    fun before() {
+        println("Before")
+    }
+
+    @AfterTest
+    fun afterTest() {
+        println("After test")
+    }
 
     @Test
     fun `record result and return it unchanged`() {
@@ -95,50 +104,22 @@ class CallRecorderTest {
         println((notNullNumber ?: "null").toString())
     }
 
-}
+    companion object {
 
-interface IRover {
-    fun explore(a: Int): Int
-    fun add(x: BigDecimal, d: LocalDate, s: String, l: Int): Int
-    fun expand(l: Int, t: List<Any>): Int
-    fun doSomething(times: Int, what: Something): Something
-    fun doNothing(times: Int)
-    fun validateReason(reason: String): String
-    fun incrementCount(): Int
-}
+        @JvmStatic
+        @BeforeClass
+        fun beforeClass() {
+            println("Before class")
+        }
 
-class Rover() : IRover {
-    var count = 0
-
-    override fun doNothing(times: Int) {}
-
-    override fun explore(a: Int): Int {
-        println("Exploring $a")
-        return a+1
+        @JvmStatic
+        @AfterClass
+        fun afterClass() {
+            println("After Class")
+//            val calls = sut.getCalls()
+//            calls.forEach { println(it) }
+        }
     }
 
-    override fun incrementCount(): Int {
-        return if (++count == 2) throw TestException("Not 2") else count
-    }
-
-    override fun add(x: BigDecimal, d: LocalDate, s: String, l: Int) = l+1
-
-    override fun expand(l: Int, t: List<Any>) = l + t.size
-
-    override fun doSomething(times: Int, what: Something) = what
-
-    override fun validateReason(reason: String): String = if(reason == "Because") "Correct" else throw TestException("Bad reason: \"$reason\"")
 }
-
-class TestException(message: String): RuntimeException(message) {
-    override fun equals(other: Any?): Boolean {
-        return other != null && other is TestException && message == other.message
-    }
-
-    override fun hashCode(): Int {
-        return message!!.hashCode()
-    }
-}
-
-data class Something(val name: String, val color: String, val weight: BigDecimal, val tags: List<String>)
 
