@@ -31,22 +31,6 @@ class OutputToMock(val instanceName: String, val className: String) {
         return Optional.empty()
     }
 
-//    fun addOutputter(className: String, outputter: (arg: Any) -> String) { outputters[className] = outputter }
-
-//    fun ignoreFieldsForClass(className: String, ignoredFields: List<String>) {
-//        addOutputter(className) { arg: Any -> outputInstance(arg, ignoredFields)}
-//    }
-
-//    fun inCustomOutput(arg: Any): Boolean {
-//        for(clazz in outputters.keys) {
-//            print(clazz)
-//            if(arg is clazz.) {
-//                return true
-//            }
-//        }
-//        return false
-//    }
-
     fun save(method: Method, args: List<Any>, result: Any) {
         val argsList = argsAsCsv(args)
         val line = "every { $instanceName.${method.name}($argsList) } returns ${output(result)}"

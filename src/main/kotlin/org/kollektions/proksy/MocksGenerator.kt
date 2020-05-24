@@ -1,11 +1,18 @@
 package org.kollektions.proksy
 
 class MocksGenerator(val outputToMock: OutputToMock) {
-    fun generateCallsOfEvery(mockName: String, calls: List<FunctionCallsSummary>): String {
+    fun generateCallsOfEvery(mockName: String, calls: List<FunctionCallsSummary>, className: String): String {
         val commandsOfEvery = calls.map { resultsForOneListOfArguments(mockName, it) }.joinToString("\n\n")
-        return "fun get$mockName(){\n" +
-            "val $mockName = mockk<>()" +
-            "$commandsOfEvery\n}"
+        return "fun get${uppercaseFirstChar(mockName)}(): $className{\n" +
+            "val $mockName = mockk<$className>()\n" +
+            "$commandsOfEvery\n" +
+            "return $mockName\n}"
+    }
+
+    fun uppercaseFirstChar(name: String): String {
+        val firstChar = name.substring(0..0).toUpperCase()
+        val tail = name.substring(1)
+        return "$firstChar$tail"
     }
 
     fun resultsForOneListOfArguments(mockName: String, call: FunctionCallsSummary): String {
@@ -31,7 +38,7 @@ class MocksGenerator(val outputToMock: OutputToMock) {
         val args = call.arguments.asSequence()
             .map { outputToMock.output(it) }
             .joinToString(",\n")
-        val stub = "every({ $mockName.${call.functionName}($args) }).\n"
+        val stub = "every{ $mockName.${call.functionName}($args) }.\n"
         return stub
     }
 
