@@ -13,10 +13,8 @@ import kotlin.reflect.jvm.isAccessible
 
 class OutputToMock(val instanceName: String, val className: String) {
     val calls = mutableListOf<String>()
-    val functionCalls = mutableListOf<FunctionCall>()
     val classes = mutableSetOf<String>("io.mockk.every", "io.mockk.mockk")
     val outputters = listOf<(arg: Any) -> Optional<String>>()
-    val ignoredFieldsMap = mutableMapOf<String, List<String>>()
 
     fun customOutput(arg: Any?) : Optional<String> {
         if (arg != null) {
@@ -29,29 +27,6 @@ class OutputToMock(val instanceName: String, val className: String) {
             return Optional.empty()
         }
         return Optional.empty()
-    }
-
-    fun save(method: Method, args: List<Any>, result: Any) {
-        val argsList = argsAsCsv(args)
-        val line = "every { $instanceName.${method.name}($argsList) } returns ${output(result)}"
-        calls.add(line)
-    }
-
-    fun saveWithMethodName(args: List<Any>, methodName: String, result: Any) {
-        val argsList = argsAsCsv(args)
-        val line = "every { $instanceName.$methodName($argsList) } returns ${output(result)}"
-        calls.add(line)
-    }
-
-    fun toMethod(): String {
-        val distinctCalls = mutableListOf<String>()
-        calls.forEach { if(it !in distinctCalls) distinctCalls.add(it)}
-        return "${getImports(classes)}\n\nfun get$className(): $className {\n    val $instanceName = mockk<$className>()\n    ${distinctCalls.joinToString("\n    ")}\n    return $instanceName\n}"
-    }
-
-    fun getImports(classes: Set<String>): String {
-        val imports = classes.map { "import $it" }.sorted()
-        return imports.joinToString(  "\n" )
     }
 
     fun argsAsCsv(args: List<*>): String {

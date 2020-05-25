@@ -38,28 +38,28 @@ class MocksGeneratorTest {
     fun `stubStr without parameters`() {
         val actual = sut.stubStr("myMock",
             FunctionCallsSummary(FunctionCall("myFun", listOf(), UnitResult()) ))
-        assertEquals("every({ myMock.myFun() }).\n", actual)
+        assertEquals("every{ myMock.myFun() }.\n", actual)
     }
 
     @Test
     fun `stubStr with parameters`() {
         val actual = sut.stubStr("myMock",
             FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult()) ))
-        assertEquals("every({ myMock.myFun(42,\n\"Oranges\") }).\n", actual)
+        assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\n", actual)
     }
 
     @Test
     fun `resultsForOneListOfArguments when one result`() {
         val actual = sut.resultsForOneListOfArguments("myMock",
             FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult()) ))
-        assertEquals("every({ myMock.myFun(42,\n\"Oranges\") }).\njust(Runs)", actual)
+        assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\njust(Runs)", actual)
     }
 
     @Test
     fun `resultsForOneListOfArguments when all results same, just Runs`() {
         val actual = sut.resultsForOneListOfArguments("myMock",
             FunctionCallsSummary("myFun", listOf(42, "Oranges"), mutableListOf(UnitResult(), UnitResult())))
-        assertEquals("every({ myMock.myFun(42,\n\"Oranges\") }).\njust(Runs)", actual)
+        assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\njust(Runs)", actual)
     }
 
     @Test
@@ -67,7 +67,7 @@ class MocksGeneratorTest {
         val actual = sut.resultsForOneListOfArguments("myMock",
             FunctionCallsSummary("myFun", listOf(42, "Oranges"),
                 mutableListOf(ObjectResult(1), ObjectResult(1))))
-        assertEquals("every({ myMock.myFun(42,\n\"Oranges\") }).\nreturns(1)", actual)
+        assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\nreturns(1)", actual)
     }
 
     @Test
@@ -75,8 +75,8 @@ class MocksGeneratorTest {
         val actual = sut.resultsForOneListOfArguments("myMock",
             FunctionCallsSummary("myFun", listOf(42, "Oranges"),
                 mutableListOf(ExceptionResult(TestException("Ouch!")), ExceptionResult(TestException("Ouch!")))))
-        assertEquals("every({ myMock.myFun(42,\n" +
-            "\"Oranges\") }).\n" +
+        assertEquals("every{ myMock.myFun(42,\n" +
+            "\"Oranges\") }.\n" +
             "throws(TestException({{val cause = null\n" +
             "val message = \"Ouch!\"\n" +
             "TestException(cause,message)}}()))", actual)
@@ -87,8 +87,8 @@ class MocksGeneratorTest {
         val actual = sut.resultsForOneListOfArguments("myMock",
             FunctionCallsSummary("myFun", listOf(42, "Oranges"),
                 mutableListOf(ObjectResult(1), ExceptionResult(TestException("Ouch!")), ObjectResult(2))))
-        assertEquals("every({ myMock.myFun(42,\n" +
-            "\"Oranges\") }).\n" +
+        assertEquals("every{ myMock.myFun(42,\n" +
+            "\"Oranges\") }.\n" +
             "returns(1)\n" +
             ".andThenThrows(TestException({{val cause = null\n" +
             "val message = \"Ouch!\"\n" +
