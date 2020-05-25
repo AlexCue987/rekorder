@@ -27,6 +27,8 @@ class CallRecorder {
                 T::class.java.classLoader,
                 arrayOf(T::class.java)) { proxy, method, args ->
                 try {
+//                    val names = method.parameters.asSequence().map { it.name }.toList()
+//                    print("Parameter names = $names")
                     val ret: Any? = method!!.invoke(instance, *(args ?: arrayOfNulls<Any>(0)))
                     val result = if (ret == null) UnitResult() else ObjectResult(ret!!)
                     callRecorder.save(FunctionCall(method.name, args.toList(), result))
@@ -44,21 +46,7 @@ class CallRecorder {
         @JvmStatic
         inline fun<reified T> getRecordingProxy(instance: Any): RecordingProxy<T> {
             val callRecorder = CallRecorder()
-            val proxy = Proxy.newProxyInstance(
-                T::class.java.classLoader,
-                arrayOf(T::class.java)) { proxy, method, args ->
-                try {
-                    val ret: Any? = method!!.invoke(instance, *(args ?: arrayOfNulls<Any>(0)))
-                    val result = if (ret == null) UnitResult() else ObjectResult(ret!!)
-                    callRecorder.save(FunctionCall(method.name, args.toList(), result))
-                    ret
-                } catch (ex: InvocationTargetException) {
-                    val targetException = ex.targetException
-                    val cause = targetException.cause
-                    callRecorder.save(FunctionCall(method.name, args.toList(), ExceptionResult(targetException!!)))
-                    throw targetException
-                }
-            } as T
+            val proxy = getProxy<T>(instance, callRecorder)
             return RecordingProxy(proxy, callRecorder, T::class.java.typeName)
         }
     }
