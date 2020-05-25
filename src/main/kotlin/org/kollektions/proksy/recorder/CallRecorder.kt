@@ -1,5 +1,9 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.recorder
 
+import org.kollektions.proksy.model.ExceptionResult
+import org.kollektions.proksy.model.ObjectResult
+import org.kollektions.proksy.model.UnitResult
+import org.kollektions.proksy.model.FunctionCall
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Proxy
 

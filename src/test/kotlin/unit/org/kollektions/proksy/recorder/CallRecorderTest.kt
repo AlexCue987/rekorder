@@ -1,11 +1,18 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.recorder
 
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
-import org.kollektions.proksy.CallRecorder.Companion.getProxy
+import org.kollektions.proksy.model.ExceptionResult
+import org.kollektions.proksy.recorder.CallRecorder.Companion.getProxy
+import org.kollektions.proksy.model.FunctionCall
+import org.kollektions.proksy.model.ObjectResult
+import org.kollektions.proksy.model.UnitResult
+import org.kollektions.proksy.testmodel.IRover
+import org.kollektions.proksy.testmodel.Rover
+import org.kollektions.proksy.testmodel.TestException
 import java.math.BigDecimal
 import kotlin.test.*
 

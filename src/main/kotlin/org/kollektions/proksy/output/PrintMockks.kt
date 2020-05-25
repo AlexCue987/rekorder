@@ -1,8 +1,6 @@
 package org.kollektions.proksy.output
 
-import org.kollektions.proksy.CallRecorder
-import org.kollektions.proksy.CallsOrganizer
-import org.kollektions.proksy.mocksGenerator
+import org.kollektions.proksy.recorder.CallRecorder
 import java.io.File
 
 class PrintMockks(val className: String, val recorder: CallRecorder) {

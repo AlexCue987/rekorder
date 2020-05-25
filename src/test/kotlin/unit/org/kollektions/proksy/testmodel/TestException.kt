@@ -1,4 +1,4 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.testmodel
 
 class TestException(message: String): RuntimeException(message) {
     override fun equals(other: Any?): Boolean {

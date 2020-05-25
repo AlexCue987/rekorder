@@ -1,5 +1,7 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.output
 
+import org.kollektions.proksy.model.*
+import org.kollektions.proksy.testmodel.TestException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -37,21 +39,21 @@ class MocksGeneratorTest {
     @Test
     fun `stubStr without parameters`() {
         val actual = sut.stubStr("myMock",
-            FunctionCallsSummary(FunctionCall("myFun", listOf(), UnitResult()) ))
+            FunctionCallsSummary(FunctionCall("myFun", listOf(), UnitResult())))
         assertEquals("every{ myMock.myFun() }.\n", actual)
     }
 
     @Test
     fun `stubStr with parameters`() {
         val actual = sut.stubStr("myMock",
-            FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult()) ))
+            FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult())))
         assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\n", actual)
     }
 
     @Test
     fun `resultsForOneListOfArguments when one result`() {
         val actual = sut.resultsForOneListOfArguments("myMock",
-            FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult()) ))
+            FunctionCallsSummary(FunctionCall("myFun", listOf(42, "Oranges"), UnitResult())))
         assertEquals("every{ myMock.myFun(42,\n\"Oranges\") }.\njust(Runs)", actual)
     }
 

@@ -5,17 +5,20 @@ import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class Step04UseOneMock {
-    val mockRover = MyMockks2().getThisRover()
+class Step04UseRecordedMocks {
+
+    private val mocks = MyMockks()
 
     @Test
     fun test1() {
+        val mockRover = mocks.getThisRover1()
         val actual = mockRover.explore(1)
         assertEquals(2, actual)
     }
 
     @Test
     fun test2() {
+        val mockRover = mocks.getThisRover2()
         val actual = mockRover.add(BigDecimal.ONE, LocalDate.MIN, "Any", 1)
         assertEquals(2, actual)
     }

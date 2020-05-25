@@ -1,4 +1,6 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.output
+
+import org.kollektions.proksy.model.*
 
 class MocksGenerator(val outputToMock: OutputToMock) {
     fun generateCallsOfEvery(mockName: String, calls: List<FunctionCallsSummary>, className: String): String {

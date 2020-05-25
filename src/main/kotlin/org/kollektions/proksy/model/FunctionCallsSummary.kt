@@ -1,4 +1,4 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.model
 
 data class FunctionCallsSummary(val functionName: String,
                                 val arguments: List<Any>,

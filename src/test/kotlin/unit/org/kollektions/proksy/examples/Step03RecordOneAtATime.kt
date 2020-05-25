@@ -1,13 +1,15 @@
 package org.kollektions.proksy.examples
 
-import org.kollektions.proksy.*
 import org.kollektions.proksy.output.PrintMockks
+import org.kollektions.proksy.recorder.CallRecorder
+import org.kollektions.proksy.testmodel.IRover
+import org.kollektions.proksy.testmodel.Rover
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class Step01RecordOneAtATime {
+class Step03RecordOneAtATime {
     private val sut = Rover()
     private val mockRoverRecorder = CallRecorder.getRecordingProxy<IRover>(sut)
     private val mockRover = mockRoverRecorder.proxy

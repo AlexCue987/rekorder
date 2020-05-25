@@ -1,4 +1,4 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.testmodel
 
 import java.math.BigDecimal
 import java.time.LocalDate

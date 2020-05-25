@@ -1,4 +1,4 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.output
 
 import io.mockk.Runs
 import io.mockk.every
@@ -54,7 +54,7 @@ class OutputToMockTest {
             "shape = \"Square\"),\nMyThing(color = \"Blue\"," +
             "shape = \"Circle\")\n))"
         val actual = sut.output(MyThingWithList("list of things",
-               listOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
+            listOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
         print(actual)
         assertEquals(expected, actual)
     }

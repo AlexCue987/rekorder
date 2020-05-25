@@ -1,14 +1,16 @@
 package org.kollektions.proksy.examples
 
 import org.junit.AfterClass
-import org.kollektions.proksy.*
 import org.kollektions.proksy.output.PrintMockks
+import org.kollektions.proksy.recorder.CallRecorder
+import org.kollektions.proksy.testmodel.IRover
+import org.kollektions.proksy.testmodel.Rover
 import java.math.BigDecimal
 import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class Step03RecordAllAtOnce {
+class Step01RecordAllAtOnce {
     @Test
     fun test1() {
         val actual = mockRover.explore(1)

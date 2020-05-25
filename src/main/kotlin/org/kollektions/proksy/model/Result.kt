@@ -1,4 +1,4 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.model
 
 sealed class IResult
 

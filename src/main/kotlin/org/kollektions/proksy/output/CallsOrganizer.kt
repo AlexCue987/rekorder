@@ -1,4 +1,7 @@
-package org.kollektions.proksy
+package org.kollektions.proksy.output
+
+import org.kollektions.proksy.model.FunctionCall
+import org.kollektions.proksy.model.FunctionCallsSummary
 
 class CallsOrganizer{
     fun organize(functionCalls: List<FunctionCall>): List<FunctionCallsSummary>{
