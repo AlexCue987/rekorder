@@ -10,63 +10,74 @@ import java.time.LocalTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class OutputToMockTest {
-    val sut = OutputToMock("myMock", "MyMock")
+class OutputToMock2Test {
+    val sut2 = OutputToMock2()
 
     @Test
     fun `outputInstance handles null`() {
-        assertEquals("null", sut.output(null))
+        assertEquals(GeneratedCode(setOf(), "null"), sut2.output(null))
     }
 
     @Test
     fun `outputInstance handles field`() {
-        assertEquals("LocalDate.of(2020, 5, 1)", sut.output(LocalDate.of(2020, 5, 1)))
+        val expected = GeneratedCode(setOf("java.time.LocalDate"), "LocalDate.of(2020, 5, 1)")
+        assertEquals(expected, sut2.output(LocalDate.of(2020, 5, 1)))
     }
 
     @Test
     fun `outputInstance handles data class`() {
-        val expected = "MyThing(color = \"Red\",shape = \"Square\")"
-        assertEquals(expected, sut.output(MyThing("Red", "Square")))
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing", "java.util.String"), "MyThing(color = \"Red\",shape = \"Square\")")
+        assertEquals(expected, sut2.output(MyThing("Red", "Square")))
     }
 
     @Test
     fun `outputInstance handles nested data class`() {
-        val expected = "MyNestedThing(quantity = 1,thing = MyThing(color = \"Red\",shape = \"Square\"))"
-        val actual = sut.output(MyNestedThing(1, MyThing("Red", "Square")))
-        print(actual)
+        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+            "org.kollektions.proksy.output.model.MyNestedThing", "java.util.String"),
+            "MyNestedThing(quantity = 1,thing = MyThing(color = \"Red\",shape = \"Square\"))")
+        val actual = sut2.output(MyNestedThing(1, MyThing("Red", "Square")))
         assertEquals(expected, actual)
     }
 
     @Test
     fun `outputInstance handles data class nested twice`() {
-        val expected = "MyDoubleNestedThing(comment = \"double nested\"," +
+        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+            "org.kollektions.proksy.output.model.MyNestedThing",
+            "org.kollektions.proksy.output.model.MyDoubleNestedThing",
+            "java.util.String"),
+            "MyDoubleNestedThing(comment = \"double nested\"," +
             "nestedThing = MyNestedThing(quantity = 1," +
             "thing = MyThing(color = \"Red\"," +
-            "shape = \"Square\")))"
-        val actual = sut.output(MyDoubleNestedThing(comment = "double nested", nestedThing = MyNestedThing(1, MyThing("Red", "Square"))))
-        print(actual)
+            "shape = \"Square\")))")
+        val actual = sut2.output(MyDoubleNestedThing(comment = "double nested", nestedThing = MyNestedThing(1, MyThing("Red", "Square"))))
         assertEquals(expected, actual)
     }
 
     @Test
     fun `outputInstance handles nested list`() {
-        val expected = "MyThingWithList(name = \"list of things\"," +
+        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+            "java.util.List",
+            "org.kollektions.proksy.output.model.MyThingWithList",
+            "java.util.String"), "MyThingWithList(name = \"list of things\"," +
             "things = listOf(\nMyThing(color = \"Red\"," +
             "shape = \"Square\"),\nMyThing(color = \"Blue\"," +
-            "shape = \"Circle\")\n))"
-        val actual = sut.output(MyThingWithList("list of things",
+            "shape = \"Circle\")\n))")
+        val actual = sut2.output(MyThingWithList("list of things",
             listOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
-        print(actual)
         assertEquals(expected, actual)
     }
 
     @Test
     fun `outputInstance handles nested set`() {
-        val expected = "MyThingWithSet(name = \"list of things\",things = setOf(\n" +
+        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+            "java.util.Set",
+            "org.kollektions.proksy.output.model.MyThingWithSet",
+            "java.util.String"),
+            "MyThingWithSet(name = \"list of things\",things = setOf(\n" +
             "MyThing(color = \"Red\",shape = \"Square\"),\n" +
             "MyThing(color = \"Blue\",shape = \"Circle\")\n" +
-            "))"
-        val actual = sut.output(MyThingWithSet("list of things",
+            "))")
+        val actual = sut2.output(MyThingWithSet("list of things",
             setOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
         print(actual)
         assertEquals(expected, actual)
@@ -74,20 +85,24 @@ class OutputToMockTest {
 
     @Test
     fun `outputInstance handles nested map`() {
-        val expected = "MyThingWithMap(name = \"list of things\"," +
+        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+            "java.util.Map",
+            "org.kollektions.proksy.output.model.MyThingWithMap",
+            "java.time.LocalDate",
+            "java.util.String"),
+            "MyThingWithMap(name = \"list of things\"," +
             "things = mapOf(\n" +
             "LocalDate.of(2020, 5, 1) to MyThing(color = \"Red\",shape = \"Square\"),\n" +
-            "LocalDate.of(2020, 5, 2) to MyThing(color = \"Blue\",shape = \"Circle\")\n))"
-        val actual = sut.output(MyThingWithMap("list of things",
+            "LocalDate.of(2020, 5, 2) to MyThing(color = \"Blue\",shape = \"Circle\")\n))")
+        val actual = sut2.output(MyThingWithMap("list of things",
             mapOf(LocalDate.of(2020, 5, 1) to MyThing("Red", "Square"),
                 LocalDate.of(2020, 5, 2) to MyThing("Blue", "Circle"))))
-        print(actual)
         assertEquals(expected, actual)
     }
 
     @Test
     fun `outputInstance handles nested list of maps`() {
-        val expected = "MyThingWithListOfMaps(name = \"list of things\",things = listOf(\n" +
+        val expectedCode = "MyThingWithListOfMaps(name = \"list of things\",things = listOf(\n" +
             "mapOf(\n" +
             "LocalTime.of(6, 10, 0) to MyThing(color = \"Red\",shape = \"Square\"),\n" +
             "LocalTime.of(7, 15, 0) to MyThing(color = \"Blue\",shape = \"Circle\")\n" +
@@ -97,7 +112,13 @@ class OutputToMockTest {
             "LocalTime.of(8, 15, 0) to MyThing(color = \"Amber\",shape = \"Circle\")\n" +
             ")\n" +
             "))"
-        val actual = sut.output(MyThingWithListOfMaps("list of things",
+        val expected = GeneratedCode(setOf("java.util.String",
+            "java.time.LocalTime",
+            "org.kollektions.proksy.output.model.MyThing",
+            "java.util.List",
+            "java.util.Map",
+            "org.kollektions.proksy.output.model.MyThingWithListOfMaps"), expectedCode)
+        val actual = sut2.output(MyThingWithListOfMaps("list of things",
             listOf(
                 mapOf(LocalTime.of(6, 10) to MyThing("Red", "Square"),
                     LocalTime.of(7, 15) to MyThing("Blue", "Circle")),
@@ -111,42 +132,43 @@ class OutputToMockTest {
     @Test
     fun `output handles private field`() {
         val withPrivateField = ClassWithPrivateField("Yellow", "Triangle")
-        val actual = sut.output(withPrivateField)
-        print(actual)
-        val expected = "ClassWithPrivateField({{val color = \"Yellow\"\n" +
+        val actual = sut2.output(withPrivateField)
+        val expectedCode = "ClassWithPrivateField({{val color = \"Yellow\"\n" +
             "val shape = \"Triangle\"\n" +
             "ClassWithPrivateField(color,shape)}}())"
+        val expected = GeneratedCode(setOf("java.util.String", "org.kollektions.proksy.output.model.ClassWithPrivateField"), expectedCode)
         assertEquals(expected, actual)
     }
 
     @Test
     fun `output uses only primary constructor parameters for data classes`() {
         val withExtraProperty = DataClassWithExtraProperty("Red", "Oval")
-        val actual = sut.output(withExtraProperty)
-        print(actual)
-        val expected = "DataClassWithExtraProperty(color = \"Red\"," +
-            "shape = \"Oval\")"
+        val actual = sut2.output(withExtraProperty)
+        val expected = GeneratedCode(setOf("java.util.String",
+            "org.kollektions.proksy.output.model.DataClassWithExtraProperty"),
+            "DataClassWithExtraProperty(color = \"Red\"," +
+            "shape = \"Oval\")")
         assertEquals(expected, actual)
     }
 
     @Test
     fun `getFields returns all fields of data class without other properties`() {
         val withExtraProperty = MyThing("Red", "Oval")
-        val actual = sut.getFields(withExtraProperty)
+        val actual = sut2.getFields(withExtraProperty)
         assertEquals(listOf("color", "shape"), actual.map { it.name })
     }
 
     @Test
     fun `getFields returns all fields of data class with another property`() {
         val withExtraProperty = DataClassWithExtraProperty("Red", "Oval")
-        val actual = sut.getFields(withExtraProperty)
+        val actual = sut2.getFields(withExtraProperty)
         assertEquals(listOf("color", "shape"), actual.map { it.name })
     }
 
     @Test
     fun `getFields returns all properties of non-data class`() {
         val withExtraProperty = ClassWithPrivateFieldAndProperty("Red", "Oval")
-        val actual = sut.getFields(withExtraProperty)
+        val actual = sut2.getFields(withExtraProperty)
         assertEquals(setOf("color", "description", "shape"), actual.map { it.name }.toSet())
     }
 

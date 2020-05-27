@@ -1,6 +1,7 @@
 package org.kollektions.proksy.output
 
 import org.kollektions.proksy.model.*
+import org.kollektions.proksy.output.model.MyThing
 import org.kollektions.proksy.testmodel.TestException
 import kotlin.test.Test
 import kotlin.test.assertEquals
