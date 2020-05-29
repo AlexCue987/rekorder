@@ -26,14 +26,14 @@ class OutputToMock2Test {
 
     @Test
     fun `outputInstance handles data class`() {
-        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing", "java.util.String"), "MyThing(color = \"Red\",shape = \"Square\")")
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing"), "MyThing(color = \"Red\",shape = \"Square\")")
         assertEquals(expected, sut2.output(MyThing("Red", "Square")))
     }
 
     @Test
     fun `outputInstance handles nested data class`() {
         val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
-            "org.kollektions.proksy.output.model.MyNestedThing", "java.util.String"),
+            "org.kollektions.proksy.output.model.MyNestedThing"),
             "MyNestedThing(quantity = 1,thing = MyThing(color = \"Red\",shape = \"Square\"))")
         val actual = sut2.output(MyNestedThing(1, MyThing("Red", "Square")))
         assertEquals(expected, actual)
@@ -43,8 +43,7 @@ class OutputToMock2Test {
     fun `outputInstance handles data class nested twice`() {
         val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "org.kollektions.proksy.output.model.MyNestedThing",
-            "org.kollektions.proksy.output.model.MyDoubleNestedThing",
-            "java.util.String"),
+            "org.kollektions.proksy.output.model.MyDoubleNestedThing"),
             "MyDoubleNestedThing(comment = \"double nested\"," +
             "nestedThing = MyNestedThing(quantity = 1," +
             "thing = MyThing(color = \"Red\"," +
@@ -57,8 +56,8 @@ class OutputToMock2Test {
     fun `outputInstance handles nested list`() {
         val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.List",
-            "org.kollektions.proksy.output.model.MyThingWithList",
-            "java.util.String"), "MyThingWithList(name = \"list of things\"," +
+            "org.kollektions.proksy.output.model.MyThingWithList"),
+            "MyThingWithList(name = \"list of things\"," +
             "things = listOf(\nMyThing(color = \"Red\"," +
             "shape = \"Square\"),\nMyThing(color = \"Blue\"," +
             "shape = \"Circle\")\n))")
@@ -71,8 +70,7 @@ class OutputToMock2Test {
     fun `outputInstance handles nested set`() {
         val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.Set",
-            "org.kollektions.proksy.output.model.MyThingWithSet",
-            "java.util.String"),
+            "org.kollektions.proksy.output.model.MyThingWithSet"),
             "MyThingWithSet(name = \"list of things\",things = setOf(\n" +
             "MyThing(color = \"Red\",shape = \"Square\"),\n" +
             "MyThing(color = \"Blue\",shape = \"Circle\")\n" +
@@ -88,8 +86,7 @@ class OutputToMock2Test {
         val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.Map",
             "org.kollektions.proksy.output.model.MyThingWithMap",
-            "java.time.LocalDate",
-            "java.util.String"),
+            "java.time.LocalDate"),
             "MyThingWithMap(name = \"list of things\"," +
             "things = mapOf(\n" +
             "LocalDate.of(2020, 5, 1) to MyThing(color = \"Red\",shape = \"Square\"),\n" +
@@ -112,7 +109,7 @@ class OutputToMock2Test {
             "LocalTime.of(8, 15, 0) to MyThing(color = \"Amber\",shape = \"Circle\")\n" +
             ")\n" +
             "))"
-        val expected = GeneratedCode(setOf("java.util.String",
+        val expected = GeneratedCode(setOf(
             "java.time.LocalTime",
             "org.kollektions.proksy.output.model.MyThing",
             "java.util.List",
@@ -136,7 +133,7 @@ class OutputToMock2Test {
         val expectedCode = "ClassWithPrivateField({{val color = \"Yellow\"\n" +
             "val shape = \"Triangle\"\n" +
             "ClassWithPrivateField(color,shape)}}())"
-        val expected = GeneratedCode(setOf("java.util.String", "org.kollektions.proksy.output.model.ClassWithPrivateField"), expectedCode)
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.ClassWithPrivateField"), expectedCode)
         assertEquals(expected, actual)
     }
 
@@ -144,7 +141,7 @@ class OutputToMock2Test {
     fun `output uses only primary constructor parameters for data classes`() {
         val withExtraProperty = DataClassWithExtraProperty("Red", "Oval")
         val actual = sut2.output(withExtraProperty)
-        val expected = GeneratedCode(setOf("java.util.String",
+        val expected = GeneratedCode(setOf(
             "org.kollektions.proksy.output.model.DataClassWithExtraProperty"),
             "DataClassWithExtraProperty(color = \"Red\"," +
             "shape = \"Oval\")")

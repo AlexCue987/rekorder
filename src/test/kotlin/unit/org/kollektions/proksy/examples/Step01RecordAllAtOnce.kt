@@ -27,7 +27,9 @@ class Step01RecordAllAtOnce {
         private val sut = Rover()
         private val mockRoverRecorder = CallRecorder.getRecordingProxy<IRover>(sut)
         private val mockRover = mockRoverRecorder.proxy
-        private val printer = PrintMockks("MyMockks2", mockRoverRecorder.recorder)
+        private val printer = PrintMockks("MyMockks2",
+            mockRoverRecorder.recorder,
+            "org.kollektions.proksy.testmodel.IRover")
 
         @JvmStatic
         @AfterClass

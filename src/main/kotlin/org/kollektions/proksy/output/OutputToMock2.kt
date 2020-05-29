@@ -62,7 +62,7 @@ class OutputToMock2() {
             arg is Int -> GeneratedCode(setOf(),arg.toString())
             arg is Boolean -> GeneratedCode(setOf(),arg.toString())
             arg is Long -> GeneratedCode(setOf(),"${arg}L")
-            arg is String -> GeneratedCode(setOf("java.util.String"),"\"$arg\"")
+            arg is String -> GeneratedCode(setOf(),"\"$arg\"")
             arg is LocalDate -> GeneratedCode(setOf("java.time.LocalDate"),"LocalDate.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth})")
             arg is LocalTime -> GeneratedCode(setOf("java.time.LocalTime"),"LocalTime.of(${arg.hour}, ${arg.minute}, ${arg.second})")
             arg is LocalDateTime -> GeneratedCode(setOf("java.time.LocalDateTime"),"LocalDateTime.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth}, ${arg.hour}, ${arg.minute}, ${arg.second})")

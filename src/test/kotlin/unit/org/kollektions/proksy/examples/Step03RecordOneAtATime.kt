@@ -13,7 +13,8 @@ class Step03RecordOneAtATime {
     private val sut = Rover()
     private val mockRoverRecorder = CallRecorder.getRecordingProxy<IRover>(sut)
     private val mockRover = mockRoverRecorder.proxy
-    private val printer = PrintMockks("MyMockks", mockRoverRecorder.recorder)
+    private val printer = PrintMockks("MyMockks", mockRoverRecorder.recorder,
+    "org.kollektions.proksy.testmodel.IRover")
 
     @Test
     fun test1() {

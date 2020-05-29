@@ -168,5 +168,13 @@ class OutputToMockTest {
             }
         }
     }
+
+    @Test
+    fun `two full pages and some more`() {
+        val pageSize = 20
+        val items = 45
+        val fullPages = items/pageSize
+        println("Items in full pages ${pageSize*fullPages}")
+    }
 }
 

@@ -103,4 +103,4 @@ class OutputToMock(val instanceName: String, val className: String) {
     }
 }
 
-fun mocksGenerator(instanceName: String, className: String) = MocksGenerator(OutputToMock(instanceName, className))
+fun mocksGenerator(instanceName: String, className: String) = MocksGenerator(OutputToMock2())
