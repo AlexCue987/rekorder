@@ -1,4 +1,4 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.generator
 
 data class GeneratedCode(val classesToImport: Set<String>, val code: String)
 

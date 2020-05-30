@@ -1,13 +1,14 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.generator
 
 import org.kollektions.proksy.model.*
-import org.kollektions.proksy.output.model.MyThing
+import org.kollektions.proksy.generator.model.MyThing
+import org.kollektions.proksy.reflector.Reflector
 import org.kollektions.proksy.testmodel.TestException
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class MocksGeneratorTest {
-    private val sut = MocksGenerator(OutputToMock2())
+    private val sut = MocksGenerator(Reflector())
 
     @Test
     fun `firstResultStr generates result`() {
@@ -15,9 +16,10 @@ class MocksGeneratorTest {
             Pair(ObjectResult(MyThing("Red", "Point")),
                 GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing"),"returns(MyThing(color = \"Red\",shape = \"Point\"))")),
             Pair(UnitResult(), GeneratedCode(setOf(),"just(Runs)")),
-            Pair(ExceptionResult(Exception("Oops!")), GeneratedCode(setOf("java.lang.Exception"), "throws(Exception({{val cause = null\n" +
+            Pair(ExceptionResult(Exception("Oops!")), GeneratedCode(setOf("java.lang.Exception"),
+                "throws({val cause = null\n" +
                 "val message = \"Oops!\"\n" +
-                "Exception(cause,message)}}()))")))
+                "Exception(cause,message)}())")))
 
         cases.forEach {
             assertEquals(it.second, sut.firstResultStr(it.first))
@@ -31,9 +33,10 @@ class MocksGeneratorTest {
                 GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing"),"\n.andThen(MyThing(color = \"Red\",shape = \"Point\"))")),
             Pair(UnitResult(), GeneratedCode(setOf(),"\n.andThen(Unit)")),
             Pair(ExceptionResult(Exception("Oops!")),
-                GeneratedCode(setOf("java.lang.Exception"), "\n.andThenThrows(Exception({{val cause = null\n" +
+                GeneratedCode(setOf("java.lang.Exception"),
+                    "\n.andThenThrows({val cause = null\n" +
                 "val message = \"Oops!\"\n" +
-                "Exception(cause,message)}}()))")))
+                "Exception(cause,message)}())")))
 
         cases.forEach {
             assertEquals(it.second, sut.nextResultStr(it.first))
@@ -83,9 +86,9 @@ class MocksGeneratorTest {
                 mutableListOf(ExceptionResult(TestException("Ouch!")), ExceptionResult(TestException("Ouch!")))))
         assertEquals(GeneratedCode(setOf("org.kollektions.proksy.testmodel.TestException"),"every{ myMock.myFun(42,\n" +
             "\"Oranges\") }.\n" +
-            "throws(TestException({{val cause = null\n" +
+            "throws({val cause = null\n" +
             "val message = \"Ouch!\"\n" +
-            "TestException(cause,message)}}()))"), actual)
+            "TestException(cause,message)}())"), actual)
     }
 
     @Test
@@ -96,9 +99,9 @@ class MocksGeneratorTest {
         assertEquals(GeneratedCode(setOf("org.kollektions.proksy.testmodel.TestException"),"every{ myMock.myFun(42,\n" +
             "\"Oranges\") }.\n" +
             "returns(1)\n" +
-            ".andThenThrows(TestException({{val cause = null\n" +
+            ".andThenThrows({val cause = null\n" +
             "val message = \"Ouch!\"\n" +
-            "TestException(cause,message)}}()))\n" +
+            "TestException(cause,message)}())\n" +
             ".andThen(2)"), actual)
     }
 }

@@ -1,4 +1,4 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.generator
 
 import org.kollektions.proksy.model.FunctionCall
 import org.kollektions.proksy.model.FunctionCallsSummary

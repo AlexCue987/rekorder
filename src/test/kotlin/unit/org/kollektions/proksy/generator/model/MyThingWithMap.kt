@@ -1,4 +1,4 @@
-package org.kollektions.proksy.output.model
+package org.kollektions.proksy.generator.model
 
 import java.time.LocalDate
 

@@ -1,5 +1,9 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.reflector
 
+import org.kollektions.proksy.generator.GeneratedCode
+import org.kollektions.proksy.generator.generatedCodeOfList
+import org.kollektions.proksy.generator.generatedCodeOfMap
+import org.kollektions.proksy.generator.generatedCodeOfSet
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -10,7 +14,7 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
-class OutputToMock2() {
+class Reflector() {
     val classes = mutableSetOf<String>("io.mockk.every", "io.mockk.mockk")
     val outputters = listOf<(arg: Any) -> Optional<String>>()
 
@@ -58,15 +62,15 @@ class OutputToMock2() {
             return customOutputStr.get()
         }
         return when {
-            arg.javaClass.isEnum -> GeneratedCode(setOf(),"${arg.javaClass.simpleName}.$arg")
-            arg is Int -> GeneratedCode(setOf(),arg.toString())
-            arg is Boolean -> GeneratedCode(setOf(),arg.toString())
-            arg is Long -> GeneratedCode(setOf(),"${arg}L")
-            arg is String -> GeneratedCode(setOf(),"\"$arg\"")
-            arg is LocalDate -> GeneratedCode(setOf("java.time.LocalDate"),"LocalDate.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth})")
-            arg is LocalTime -> GeneratedCode(setOf("java.time.LocalTime"),"LocalTime.of(${arg.hour}, ${arg.minute}, ${arg.second})")
-            arg is LocalDateTime -> GeneratedCode(setOf("java.time.LocalDateTime"),"LocalDateTime.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth}, ${arg.hour}, ${arg.minute}, ${arg.second})")
-            arg is BigDecimal -> GeneratedCode(setOf("java.math.BigDecimal"),"BigDecimal(\"${arg.toPlainString()}\")")
+            arg.javaClass.isEnum -> GeneratedCode(setOf(), "${arg.javaClass.simpleName}.$arg")
+            arg is Int -> GeneratedCode(setOf(), arg.toString())
+            arg is Boolean -> GeneratedCode(setOf(), arg.toString())
+            arg is Long -> GeneratedCode(setOf(), "${arg}L")
+            arg is String -> GeneratedCode(setOf(), "\"$arg\"")
+            arg is LocalDate -> GeneratedCode(setOf("java.time.LocalDate"), "LocalDate.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth})")
+            arg is LocalTime -> GeneratedCode(setOf("java.time.LocalTime"), "LocalTime.of(${arg.hour}, ${arg.minute}, ${arg.second})")
+            arg is LocalDateTime -> GeneratedCode(setOf("java.time.LocalDateTime"), "LocalDateTime.of(${arg.year}, ${arg.monthValue}, ${arg.dayOfMonth}, ${arg.hour}, ${arg.minute}, ${arg.second})")
+            arg is BigDecimal -> GeneratedCode(setOf("java.math.BigDecimal"), "BigDecimal(\"${arg.toPlainString()}\")")
             arg is List<*> -> generatedCodeOfList(argsAsCsv(arg))
             arg is Set<*> -> generatedCodeOfSet(argsAsCsv(arg.toList()))
             arg is Map<*, *> -> generatedCodeOfMap(argsAsMap(arg))
@@ -120,6 +124,4 @@ class OutputToMock2() {
             .toList()
     }
 }
-
-//fun mocksGenerator2(instanceName: String, className: String) = MocksGenerator(OutputToMock2())
 

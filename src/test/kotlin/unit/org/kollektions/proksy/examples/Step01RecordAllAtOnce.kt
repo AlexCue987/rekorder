@@ -1,7 +1,8 @@
 package org.kollektions.proksy.examples
 
 import org.junit.AfterClass
-import org.kollektions.proksy.output.PrintMockks
+import org.junit.Ignore
+import org.kollektions.proksy.generator.PrintMockks
 import org.kollektions.proksy.recorder.CallRecorder
 import org.kollektions.proksy.testmodel.IRover
 import org.kollektions.proksy.testmodel.Rover
@@ -10,6 +11,7 @@ import java.time.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@Ignore
 class Step01RecordAllAtOnce {
     @Test
     fun test1() {

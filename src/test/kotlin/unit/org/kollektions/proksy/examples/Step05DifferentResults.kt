@@ -1,7 +1,7 @@
 package org.kollektions.proksy.examples
 
 import org.junit.Test
-import org.kollektions.proksy.output.PrintMockks
+import org.kollektions.proksy.generator.PrintMockks
 import org.kollektions.proksy.recorder.CallRecorder
 import org.kollektions.proksy.testmodel.IRover
 import org.kollektions.proksy.testmodel.Rover

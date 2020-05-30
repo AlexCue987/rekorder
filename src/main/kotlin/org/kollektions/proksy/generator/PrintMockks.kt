@@ -1,4 +1,4 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.generator
 
 import org.kollektions.proksy.recorder.CallRecorder
 import java.io.File

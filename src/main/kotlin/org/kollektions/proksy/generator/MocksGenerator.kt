@@ -1,8 +1,9 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.generator
 
 import org.kollektions.proksy.model.*
+import org.kollektions.proksy.reflector.Reflector
 
-class MocksGenerator(private val outputToMock: OutputToMock2) {
+class MocksGenerator(private val outputToMock: Reflector) {
     fun generateCallsOfEvery(mockName: String, calls: List<FunctionCallsSummary>, className: String): GeneratedCode {
         val mocks = calls.map { resultsForOneListOfArguments(mockName, it) }.toList()
         val commandsOfEvery = mocks.map { it.code }.joinToString("\n\n")
@@ -94,3 +95,5 @@ fun formatGeneratedCode(code: GeneratedCode, formatter: (input: String) -> Strin
 
 fun mergeGeneratedCode(code1: GeneratedCode, code2: GeneratedCode) =
     GeneratedCode(mergeSets(code1.classesToImport, code2.classesToImport), code1.code + code2.code)
+
+fun mocksGenerator(instanceName: String, className: String) = MocksGenerator(Reflector())

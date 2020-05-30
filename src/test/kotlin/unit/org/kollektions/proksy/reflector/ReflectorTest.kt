@@ -1,10 +1,11 @@
-package org.kollektions.proksy.output
+package org.kollektions.proksy.reflector
 
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import org.kollektions.proksy.output.model.*
+import org.kollektions.proksy.generator.GeneratedCode
+import org.kollektions.proksy.generator.model.*
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
@@ -12,8 +13,8 @@ import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class OutputToMock2Test {
-    val sut2 = OutputToMock2()
+class ReflectorTest {
+    val sut2 = Reflector()
 
     @Test
     fun `outputInstance handles null`() {
@@ -34,7 +35,7 @@ class OutputToMock2Test {
 
     @Test
     fun `outputInstance handles nested data class`() {
-        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "org.kollektions.proksy.output.model.MyNestedThing"),
             "MyNestedThing(quantity = 1,thing = MyThing(color = \"Red\",shape = \"Square\"))")
         val actual = sut2.output(MyNestedThing(1, MyThing("Red", "Square")))
@@ -43,26 +44,26 @@ class OutputToMock2Test {
 
     @Test
     fun `outputInstance handles data class nested twice`() {
-        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "org.kollektions.proksy.output.model.MyNestedThing",
             "org.kollektions.proksy.output.model.MyDoubleNestedThing"),
             "MyDoubleNestedThing(comment = \"double nested\"," +
-            "nestedThing = MyNestedThing(quantity = 1," +
-            "thing = MyThing(color = \"Red\"," +
-            "shape = \"Square\")))")
+                "nestedThing = MyNestedThing(quantity = 1," +
+                "thing = MyThing(color = \"Red\"," +
+                "shape = \"Square\")))")
         val actual = sut2.output(MyDoubleNestedThing(comment = "double nested", nestedThing = MyNestedThing(1, MyThing("Red", "Square"))))
         assertEquals(expected, actual)
     }
 
     @Test
     fun `outputInstance handles nested list`() {
-        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.List",
             "org.kollektions.proksy.output.model.MyThingWithList"),
             "MyThingWithList(name = \"list of things\"," +
-            "things = listOf(\nMyThing(color = \"Red\"," +
-            "shape = \"Square\"),\nMyThing(color = \"Blue\"," +
-            "shape = \"Circle\")\n))")
+                "things = listOf(\nMyThing(color = \"Red\"," +
+                "shape = \"Square\"),\nMyThing(color = \"Blue\"," +
+                "shape = \"Circle\")\n))")
         val actual = sut2.output(MyThingWithList("list of things",
             listOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
         assertEquals(expected, actual)
@@ -70,13 +71,13 @@ class OutputToMock2Test {
 
     @Test
     fun `outputInstance handles nested set`() {
-        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.Set",
             "org.kollektions.proksy.output.model.MyThingWithSet"),
             "MyThingWithSet(name = \"list of things\",things = setOf(\n" +
-            "MyThing(color = \"Red\",shape = \"Square\"),\n" +
-            "MyThing(color = \"Blue\",shape = \"Circle\")\n" +
-            "))")
+                "MyThing(color = \"Red\",shape = \"Square\"),\n" +
+                "MyThing(color = \"Blue\",shape = \"Circle\")\n" +
+                "))")
         val actual = sut2.output(MyThingWithSet("list of things",
             setOf(MyThing("Red", "Square"), MyThing("Blue", "Circle"))))
         print(actual)
@@ -85,14 +86,14 @@ class OutputToMock2Test {
 
     @Test
     fun `outputInstance handles nested map`() {
-        val expected =  GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
+        val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.MyThing",
             "java.util.Map",
             "org.kollektions.proksy.output.model.MyThingWithMap",
             "java.time.LocalDate"),
             "MyThingWithMap(name = \"list of things\"," +
-            "things = mapOf(\n" +
-            "LocalDate.of(2020, 5, 1) to MyThing(color = \"Red\",shape = \"Square\"),\n" +
-            "LocalDate.of(2020, 5, 2) to MyThing(color = \"Blue\",shape = \"Circle\")\n))")
+                "things = mapOf(\n" +
+                "LocalDate.of(2020, 5, 1) to MyThing(color = \"Red\",shape = \"Square\"),\n" +
+                "LocalDate.of(2020, 5, 2) to MyThing(color = \"Blue\",shape = \"Circle\")\n))")
         val actual = sut2.output(MyThingWithMap("list of things",
             mapOf(LocalDate.of(2020, 5, 1) to MyThing("Red", "Square"),
                 LocalDate.of(2020, 5, 2) to MyThing("Blue", "Circle"))))
@@ -132,9 +133,9 @@ class OutputToMock2Test {
     fun `output handles private field`() {
         val withPrivateField = ClassWithPrivateField("Yellow", "Triangle")
         val actual = sut2.output(withPrivateField)
-        val expectedCode = "ClassWithPrivateField({{val color = \"Yellow\"\n" +
+        val expectedCode = "{val color = \"Yellow\"\n" +
             "val shape = \"Triangle\"\n" +
-            "ClassWithPrivateField(color,shape)}}())"
+            "ClassWithPrivateField(color,shape)}()"
         val expected = GeneratedCode(setOf("org.kollektions.proksy.output.model.ClassWithPrivateField"), expectedCode)
         assertEquals(expected, actual)
     }
@@ -146,7 +147,7 @@ class OutputToMock2Test {
         val expected = GeneratedCode(setOf(
             "org.kollektions.proksy.output.model.DataClassWithExtraProperty"),
             "DataClassWithExtraProperty(color = \"Red\"," +
-            "shape = \"Oval\")")
+                "shape = \"Oval\")")
         assertEquals(expected, actual)
     }
 
