@@ -5,8 +5,10 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import org.kollektions.proksy.output.model.*
+import java.io.File
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -186,6 +188,21 @@ class OutputToMock2Test {
                 println("Caught ${ex.message}")
             }
         }
+    }
+
+    @Ignore
+    @Test
+    fun writes() {
+        val file = File("/Users/z002w5y/fun/rekorder/src/test/kotlin/unit/org/kollektions/proksy/examples/mocks/m.kt")
+        if(!file.exists()) {
+            file.writeText("import io.mockk.every\n" +
+                "import io.mockk.mockk\n" +
+                "import o\n" +
+                "\n" +
+                "class z {\n" +
+                "}")
+        }
+
     }
 }
 

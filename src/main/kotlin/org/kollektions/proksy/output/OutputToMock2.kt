@@ -93,8 +93,8 @@ class OutputToMock2() {
         else {
             val variableDefinitions = nameOutputPairs.map { "val ${it.first} = ${it.second.code}" }
             val variableNames = nameOutputPairs.map { it.first }
-            "$className({{${variableDefinitions.joinToString("\n")}\n" +
-                "$className(${variableNames.joinToString(",")})}}())"
+            "{${variableDefinitions.joinToString("\n")}\n" +
+                "$className(${variableNames.joinToString(",")})}()"
         }
         return GeneratedCode(classesToImport, code)
     }

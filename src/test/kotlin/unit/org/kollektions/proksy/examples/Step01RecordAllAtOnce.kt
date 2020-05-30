@@ -29,7 +29,9 @@ class Step01RecordAllAtOnce {
         private val mockRover = mockRoverRecorder.proxy
         private val printer = PrintMockks("MyMockks2",
             mockRoverRecorder.recorder,
-            "org.kollektions.proksy.testmodel.IRover")
+            "org.kollektions.proksy.testmodel.IRover",
+        "/Users/z002w5y/fun/rekorder/src/test/kotlin/unit",
+        "org.kollektions.proksy.examples.mocks")
 
         @JvmStatic
         @AfterClass

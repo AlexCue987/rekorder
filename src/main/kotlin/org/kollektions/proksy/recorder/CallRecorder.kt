@@ -26,17 +26,18 @@ class CallRecorder {
             val proxy = Proxy.newProxyInstance(
                 T::class.java.classLoader,
                 arrayOf(T::class.java)) { proxy, method, args ->
+                val arguments = args?.toList() ?: listOf()
                 try {
 //                    val names = method.parameters.asSequence().map { it.name }.toList()
 //                    print("Parameter names = $names")
                     val ret: Any? = method!!.invoke(instance, *(args ?: arrayOfNulls<Any>(0)))
                     val result = if (ret == null) UnitResult() else ObjectResult(ret!!)
-                    callRecorder.save(FunctionCall(method.name, args.toList(), result))
+                    callRecorder.save(FunctionCall(method.name, arguments, result))
                     ret
                 } catch (ex: InvocationTargetException) {
                     val targetException = ex.targetException
                     val cause = targetException.cause
-                    callRecorder.save(FunctionCall(method.name, args.toList(), ExceptionResult(targetException!!)))
+                    callRecorder.save(FunctionCall(method.name, arguments, ExceptionResult(targetException!!)))
                     throw targetException
                 }
             } as T
